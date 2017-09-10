@@ -18,9 +18,11 @@ class GUM : public distribution<T> {
 
   public:
     GUM(){};
-    explicit GUM(const std::vector<T>& x) { fit_data(x); }
+    template<typename DataVector = std::vector<T>>
+    explicit GUM(const DataVector& x) { fit_data(x); }
 
-    inline void fit_data(const std::vector<T>& x) override {
+    template<typename DataVector = std::vector<T>>
+    inline void fit_data(const DataVector& x) {
         std::vector<T> xmom(2);
         lmoment_ratios_unbiased(x, xmom);
         set_lmoment_ratios(xmom);
@@ -50,7 +52,7 @@ class GUM : public distribution<T> {
         if (nmom > 1) {
             xmom[1] = a * zmom[1];
             if (nmom > 2) {
-                for (I j = 2; j < nmom; ++j) {
+                for (std::size_t j = 2; j < nmom; ++j) {
                     xmom[j] = zmom[j];
                 }
             }

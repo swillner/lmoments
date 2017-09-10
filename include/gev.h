@@ -20,9 +20,11 @@ class GEV : public distribution<T> {
 
   public:
     GEV(){};
-    explicit GEV(const std::vector<T>& x) { fit_data(x); }
+    template<typename DataVector = std::vector<T>>
+    explicit GEV(const DataVector& x) { fit_data(x); }
 
-    inline void fit_data(const std::vector<T>& x) override {
+    template<typename DataVector = std::vector<T>>
+    inline void fit_data(const DataVector& x) {
         std::vector<T> xmom(3);
         lmoment_ratios_unbiased(x, xmom);
         set_lmoment_ratios(xmom);
@@ -34,7 +36,7 @@ class GEV : public distribution<T> {
     }
 
     inline void set_lmoment_ratios(const std::vector<T>& xmom) override {
-        static const I maxit = 20;
+        static const std::size_t maxit = 20;
         static const T eu = .57721566;   // Euler's Constant
         static const T dl2 = .69314718;  // log(2)
         static const T dl3 = 1.0986123;  // log(3)
@@ -78,7 +80,7 @@ class GEV : public distribution<T> {
                 }
                 T t0 = (t3 + 3) / 2;
                 converged_m = false;
-                for (I it = 0; it < maxit; ++it) {
+                for (std::size_t it = 0; it < maxit; ++it) {
                     T x2 = std::pow(2, -g);
                     T x3 = std::pow(3, -g);
                     T xx2 = 1 - x2;
@@ -120,7 +122,7 @@ class GEV : public distribution<T> {
             if (nmom > 1) {
                 xmom[1] = a * zmom[0];
                 if (nmom > 2) {
-                    for (I i__ = 2; i__ < nmom; ++i__) {
+                    for (std::size_t i__ = 2; i__ < nmom; ++i__) {
                         xmom[i__] = zmom[i__ - 1];
                     }
                 }
@@ -133,14 +135,14 @@ class GEV : public distribution<T> {
                 xmom[1] = a * xx2 * gam / g;
                 if (nmom > 2) {
                     T z0 = 1;
-                    for (I j = 2; j < nmom; ++j) {
+                    for (std::size_t j = 2; j < nmom; ++j) {
                         T dj = j + 1;
                         T beta = (1 - std::pow(dj, -g)) / xx2;
                         z0 = z0 * (4 * dj - 6) / dj;
                         T z__ = z0 * 3 * (dj - 1) / (dj + 1);
                         T sum = z0 * beta - z__;
                         if (j > 2) {
-                            for (I i__ = 2; i__ <= j - 1; ++i__) {
+                            for (std::size_t i__ = 2; i__ <= j - 1; ++i__) {
                                 T di = i__;
                                 z__ = z__ * (di + di + 1) * (dj - di) / ((di + di - 1) * (dj + di));
                                 sum -= z__ * xmom[i__];

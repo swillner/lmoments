@@ -7,6 +7,7 @@
 
 namespace lmoments {
 
+template<typename T>
 inline T dlgama(T x) {  // natural logarithm of the gamma function
     static const T small = 1e-7;
     static const T c5 = 8.41750841750841751e-4;
@@ -57,7 +58,8 @@ inline T dlgama(T x) {  // natural logarithm of the gamma function
     return sum1 + sum2;
 }
 
-inline void lmoment_ratios_unbiased(const std::vector<T>& x, std::vector<T>& xmom) {  // samlmu
+template<typename T, typename DataVector = std::vector<T>>
+inline void lmoment_ratios_unbiased(const DataVector& x, std::vector<T>& xmom) {  // samlmu
     const std::size_t nmom = xmom.size();
     const int n = x.size();  // type must be signed
     std::vector<T> coef1(nmom);
@@ -66,14 +68,14 @@ inline void lmoment_ratios_unbiased(const std::vector<T>& x, std::vector<T>& xmo
     if (nmom > 100) {
         throw std::invalid_argument("too many lmoment ratios requested");
     }
-    for (I j = 0; j < nmom; ++j) {
+    for (std::size_t j = 0; j < nmom; ++j) {
         xmom[j] = 0.;
     }
     if (nmom <= 2) {
         T sum1 = 0.;
         T sum2 = 0.;
         T temp = -n + 1;
-        for (I i = 0; i < n; ++i) {
+        for (int i = 0; i < n; ++i) {
             sum1 += x[i];
             sum2 += x[i] * temp;
             temp += 2.;
@@ -83,14 +85,14 @@ inline void lmoment_ratios_unbiased(const std::vector<T>& x, std::vector<T>& xmo
             xmom[1] = sum2 / (n * (n - 1));
         }
     } else {
-        for (I j = 2; j < nmom; ++j) {
+        for (std::size_t j = 2; j < nmom; ++j) {
             T temp = 1. / static_cast<T>(j * (n - j));
             coef1[j] = (2 * j - 1) * temp;
             coef2[j] = ((j - 1) * (n + j - 1)) * temp;
         }
         T temp = -n - 1;
-        I nhalf = n / 2;
-        for (I i = 0; i < nhalf; ++i) {
+        std::size_t nhalf = n / 2;
+        for (std::size_t i = 0; i < nhalf; ++i) {
             temp += 2.;
             T xi = x[i];
             T xii = x[n - 1 - i];
@@ -100,7 +102,7 @@ inline void lmoment_ratios_unbiased(const std::vector<T>& x, std::vector<T>& xmo
             T s1 = 1.;
             T s = temp / (n - 1);
             xmom[1] += s * termn;
-            for (I j = 2; j < nmom; j += 2) {
+            for (std::size_t j = 2; j < nmom; j += 2) {
                 T s2 = s1;
                 s1 = s;
                 s = coef1[j] * temp * s1 - coef2[j] * s2;
@@ -117,18 +119,18 @@ inline void lmoment_ratios_unbiased(const std::vector<T>& x, std::vector<T>& xmo
             T term = x[nhalf];
             T s = 1.;
             xmom[0] += term;
-            for (I j = 2; j < nmom; j += 2) {
+            for (std::size_t j = 2; j < nmom; j += 2) {
                 s = -coef2[j] * s;
                 xmom[j] += s * term;
             }
         }
         xmom[0] /= n;
         if (xmom[1] == 0.) {  // all data values are equal
-            for (I j = 2; j < nmom; ++j) {
+            for (std::size_t j = 2; j < nmom; ++j) {
                 xmom[j] = 0.;
             }
         } else {
-            for (I j = 2; j < nmom; ++j) {
+            for (std::size_t j = 2; j < nmom; ++j) {
                 xmom[j] /= xmom[1];
             }
             xmom[1] /= n;
@@ -139,7 +141,6 @@ inline void lmoment_ratios_unbiased(const std::vector<T>& x, std::vector<T>& xmo
 template<typename T>
 class distribution {
   public:
-    virtual void fit_data(const std::vector<T>& x) = 0;
     virtual void set_lmoment_ratios(const std::vector<T>& xmom) = 0;  // pel*
     virtual void get_lmoment_ratios(std::vector<T>& xmom) const = 0;  // lmr*
     virtual T cdf(T x) const = 0;                                     // cdf*
