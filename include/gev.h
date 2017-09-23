@@ -59,14 +59,14 @@ class GEV : public distribution<T> {
         static const T eps = 1e-6;
 
         T t3 = xmom[2];
-        if (xmom[1] <= 0 || abs(t3) >= 1) {
+        if (xmom[1] <= 0 || std::abs(t3) >= 1) {
             throw std::invalid_argument("lmoments invalid");
         }
         converged_m = true;
         if (t3 > 0) {
             T z = 1 - t3;
             g = (-1 + z * (c1 + z * (c2 + z * c3))) / (1 + z * (d1 + z * d2));
-            if (abs(g) < small) {
+            if (std::abs(g) < small) {
                 g = 0;  // == GUM
                 a = xmom[1] / dl2;
                 u = xmom[0] - eu * a;
@@ -89,7 +89,7 @@ class GEV : public distribution<T> {
                     T deriv = (xx2 * x3 * dl3 - xx3 * x2 * dl2) / (xx2 * xx2);
                     T gold = g;
                     g -= (t - t0) / deriv;
-                    if (abs(g - gold) <= eps * g) {
+                    if (std::abs(g - gold) <= eps * g) {
                         converged_m = true;
                         break;
                     }
@@ -117,7 +117,7 @@ class GEV : public distribution<T> {
         if (nmom > 20) {
             throw std::invalid_argument("too many lmoment ratios requested");
         }
-        if (abs(g) <= small) {
+        if (std::abs(g) <= small) {
             xmom[0] = u;
             if (nmom > 1) {
                 xmom[1] = a * zmom[0];

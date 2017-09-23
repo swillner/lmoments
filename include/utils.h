@@ -28,11 +28,11 @@ inline T dlgama(T x) {  // natural logarithm of the gamma function
         throw std::invalid_argument("argument out of range");
     }
     T xx;
-    if (abs(x - 2) <= small) {
+    if (std::abs(x - 2) <= small) {
         xx = x - 2;
         return std::log(x - 1) + xx * (s1 + xx * s2);
     }
-    if (abs(x - 1) <= small) {
+    if (std::abs(x - 1) <= small) {
         xx = x - 1;
         return xx * (s1 + xx * s2);
     }
