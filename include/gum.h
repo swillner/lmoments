@@ -64,6 +64,11 @@ class GUM : public distribution<T> {
         }
     }
 
+    inline T pdf(T x) const override {
+        const T y = (x - u) / a;
+        return std::exp(-y - std::exp(-y)) / a;
+    }
+
     inline T cdf(T x) const override {
         const T y = (x - u) / a;
         return std::exp(-std::exp(-y));

@@ -143,8 +143,9 @@ class distribution {
   public:
     virtual void set_lmoment_ratios(const std::vector<T>& xmom) = 0;  // pel*
     virtual void get_lmoment_ratios(std::vector<T>& xmom) const = 0;  // lmr*
-    virtual T cdf(T x) const = 0;                                     // cdf*
-    virtual T quantile(T f) const = 0;                                // qua*
+    virtual T pdf(T x) const = 0;
+    virtual T cdf(T x) const = 0;       // cdf*
+    virtual T quantile(T f) const = 0;  // qua*
     virtual std::vector<T> get_parameters() const = 0;
     virtual ~distribution() = default;
 };

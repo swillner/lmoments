@@ -158,6 +158,20 @@ class GEV : public distribution<T> {
         }
     }
 
+    inline T pdf(T x) const override {
+        constexpr T small = 1e-15;
+        T y = (x - u) / a;
+        if (g == 0.0) {
+            return std::exp(-y - std::exp(-y)) / a;
+        }
+        const T arg = 1 - g * y;
+        if (arg > small) {
+            y = -std::log(arg) / g;
+            return std::exp((g - 1) * y - std::exp(-y)) / a;
+        }
+        return 0;
+    }
+
     inline T cdf(T x) const override {
         constexpr T small = 1e-15;
         T y = (x - u) / a;
@@ -190,7 +204,7 @@ class GEV : public distribution<T> {
     }
 
     inline std::vector<T> get_parameters() const override { return std::vector<T>({u, a, g}); }
-};
+};  // namespace lmoments
 }  // namespace lmoments
 
 #endif
